@@ -1,7 +1,81 @@
+import requests
 from django.shortcuts import render
+from .models import city as citi
+from django.http import HttpResponseRedirect
+import googlemaps
+
 
 # Create your views here.
 
 
-def home(request):
-    return render(request,'home.html')
+def home(request, units='metric', message=None, geop=False):
+    measure = '°C'
+    cities = citi.objects.all()
+    weather_data = []
+    if units == 'imperial':
+        measure = '°F'
+    for city in cities:
+        url = 'https://api.openweathermap.org/data/2.5/weather?q=' + city.name + '&units=' + units + '&appid=a7fe874c8ca9992dc4bf58cbce8bdc72'
+
+        r = requests.get(url).json()
+        #print(r)
+        city_weather = {
+            'id': city.id,
+            'city': city.name,
+            'temperature': r['main']['temp'],
+            'description': r['weather'][0]['description'],
+            'icon': r['weather'][0]['icon'],
+            'measure': measure
+            }
+        # print(city_weather)
+        weather_data.append(city_weather)
+        # print("\n\n\n")
+        context = {'weather_data': weather_data}
+
+        if message:
+            context['message'] = message
+        if geop:
+            gmaps = googlemaps.Client(key='AIzaSyBw72w-fMicagYAMefV_wIqOJOJJpf69wI')
+            position = gmaps.geocode()
+            lat = position.latitude
+            long = position.longitude
+            url = 'api.openweathermap.org/data/2.5/weather?lat='+lat+'&lon='+long+'&appid=a7fe874c8ca9992dc4bf58cbce8bdc72'
+            r = requests.get(url).json()
+            print(r)
+            my_city = {
+                'city': r['name'],
+                'temperature': r['main']['temp'],
+                'description': r['weather'][0]['description'],
+                'icon': r['weather'][0]['icon'],
+                'measure': measure
+            }
+            context['my_city'] = my_city
+            return render(request, 'home.html', context)
+
+
+def delete(request, pk):
+    focused = citi.objects.get(id=pk)
+    focused.delete()
+    return HttpResponseRedirect('/')
+
+
+def add(request):
+    name = request.POST.get('city')
+    if name:
+        old_cities = citi.objects.all()
+        for old_city in old_cities:
+            if name == old_city.name:
+                message = 'The City %s already exists' % name
+                return home(request,message=message)
+        url = 'https://api.openweathermap.org/data/2.5/weather?q=' + name + '&units=imperial&appid=a7fe874c8ca9992dc4bf58cbce8bdc72'
+        r = requests.get(url).json()
+        if r['cod'] == '404':
+            message = 'The city %s doesn\'t exist' % name
+            return home(request, message=message)
+        new_citi = citi(name=name)
+        new_citi.save()
+        return HttpResponseRedirect('/')
+    else:
+        return HttpResponseRedirect('/')
+
+

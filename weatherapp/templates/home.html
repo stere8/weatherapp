@@ -1,4 +1,34 @@
 {% extends 'base.html' %}
 {% block container %}
-    
+        <section class="section">
+        <div class="container text-center">
+        {% if message %}<div class="btn-danger">
+            <p><h2>{{ message }}</h2></p></div>
+        {% endif %}
+            {% for city_weather in weather_data  %}
+            <div class="columns text-center">
+                        <article class="media text-center d-flex justify-content-center">
+                            <div class="media-left text-center">
+                                <figure class="image is-50x50 text-center">
+                                    <img src="http://openweathermap.org/img/w/{{ city_weather.icon }}.png" alt="Image" height="80cm">
+                                </figure>
+                            </div>
+                            <div class="media-content text-center">
+                                <div class="content text-center">
+                                    <p>
+                                        <span class="title text-center"><h2>{{ city_weather.city }}</h2></span>
+                                        <br>
+                                        <span class="subtitle text-center"><h5>{{ city_weather.temperature }} {{ city_weather.measure }}</h5></span>
+                                        <br><h6>{{ city_weather.description }}</h6>
+                                    </p>
+                                       <a href="{% url 'delete'  city_weather.id %}" class="btn btn-danger">Delete</a>
+                                </div>
+                            </div>
+                        </article>
+             </div>
+                             <hr style="width: 100%; color: black; height: 2.5px; background-color:black;" />
+                <br>
+            {% endfor  %}
+        </div>
+    </section>
 {% endblock %}
