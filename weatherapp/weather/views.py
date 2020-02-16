@@ -2,13 +2,14 @@ import requests
 from django.shortcuts import render
 from .models import city as citi
 from django.http import HttpResponseRedirect, Http404
+import datetime
 
 
 # Create your views here.
 
 
 def home(request, units='metric', message=None):
-    context = []
+    context = {}
     cities = citi.objects.all()
     weather_data = []
     if units == 'imperial':
@@ -20,18 +21,20 @@ def home(request, units='metric', message=None):
     for city in cities:
         url = 'https://api.openweathermap.org/data/2.5/weather?q=' + city.name + '&units=' + units + '&appid=a7fe874c8ca9992dc4bf58cbce8bdc72'
         r = requests.get(url).json()
+        now = datetime.date.today()
+        context['now'] = now
         city_weather = {
             'id': city.id,
             'city': city.name,
             'temperature': r['main']['temp'],
             'description': r['weather'][0]['description'],
             'icon': r['weather'][0]['icon'],
-            'measure': measure
+            'measure': measure,
         }
         weather_data.append(city_weather)
-        context = {'weather_data': weather_data}
-        if message:
-            context['message'] = message
+    context['weather_data']= weather_data
+    if message:
+        context['message'] = message
     return render(request, 'home.html', context)
 
 

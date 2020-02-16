@@ -7,7 +7,7 @@
 <div class="bg-light">
 <br class="">
     <nav class="navbar navbar-expand-md navbar-dark bg-dark fixed-top">
-  <a class="navbar-brand" href="{% url 'home' 'metric' %}">WEATHER APP</a>
+        <a class="navbar-brand" href="{% url 'home' 'metric' %}"><h3>WEATHER APP</h3></a>
         <button  class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarsExampleDefault" aria-controls="navbarsExampleDefault" aria-expanded="false" aria-label="Toggle navigation">
             <span class="navbar-toggler-icon"></span>
   </button>
@@ -17,6 +17,11 @@
     <ul class="navbar-nav mr-auto">
         <a class="btn btn-secondary " href="{% url 'home' 'metric' %}">°C </a>
         <a class="btn btn-secondary " href="{% url 'home' 'imperial' %}">°F </a>
+        <div class="select2-container--above" style="
+    padding-left: 50px;
+    border-left-width: 20px;
+    padding-top: 5px;
+    color: aliceblue"><h3>Today's Date: {{ now }}</h3> </div>
     </ul>
     <form method="post" class="form-inline my-2 my-lg-0" action="{% url 'add' %}">
         {% csrf_token %}
