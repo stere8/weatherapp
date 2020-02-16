@@ -1,5 +1,6 @@
 from django.urls import path
-from .views import home,add,delete
+from django.conf.urls import handler404
+from .views import home,add,delete,error_404
 
 urlpatterns = [
     path('', home, name='home'),
@@ -7,3 +8,5 @@ urlpatterns = [
     path('add/',add, name='add' ),
     path('delete/<int:pk>/',delete,name='delete')
 ]
+
+handler404 = error_404
